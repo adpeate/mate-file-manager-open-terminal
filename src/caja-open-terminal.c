@@ -34,7 +34,7 @@
 #include <gtk/gtkwidget.h>
 #include <gtk/gtkmain.h>
 
-#include <libmate/mate-desktop-item.h>
+#include <libmate-desktop/mate-desktop-item.h>
 #include <gio/gio.h>
 
 #include <errno.h>
@@ -191,6 +191,7 @@ parse_sftp_uri (GFile *file, char **host, guint *port, char **user,
 	p = strchr (u, '/');
 	h = strchr(u, '@');
 
+
 	if (h && ((p == NULL) || (h < p))) {
 		*h='\0';
 		h++;
@@ -202,7 +203,9 @@ parse_sftp_uri (GFile *file, char **host, guint *port, char **user,
 	s = strchr(h, ':');
 
 	if (s && (p == NULL || s < p)) {
-		h_end = s-1;
+		//h_end = s-1;
+		//above would often trim last char off hostname, causing remote terminal to close immediately
+		h_end = s;
 		*s = '\0';
 		s++;
 	} else {
@@ -214,12 +217,12 @@ parse_sftp_uri (GFile *file, char **host, guint *port, char **user,
 		h_end = h + strlen(h);
 	}
 
+
 	*user = g_strdup(u);
 	*port = s == NULL ? 0 : atoi(s); /* FIXME: getservbyname ? */
 	*path = g_uri_unescape_string (p, "/");
 	*h_end = '\0';
 	*host = g_strdup(h);
-
 	g_free (uri);
 }
 
@@ -269,6 +272,8 @@ append_sftp_info (char **terminal_exec,
 	g_free (quoted_cmd);
 	g_free (user_host);
 	g_object_unref (vfs_uri);
+
+
 }
 
 static void
